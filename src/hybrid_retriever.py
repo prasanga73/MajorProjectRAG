@@ -201,11 +201,14 @@ class HybridRetriever:
             },
 
             # Symbols and Miscellaneous
-            r"\b(flag|anthem|coat of arms|official language|preamble|amendment|schedules|Nepal|nepal)\b": {
+            r"\b(flag|anthem|coat of arms|official language|preamble|amendment|schedules)\b": {
                 "source": "Constitution of Nepal, 2015",
-                "part_keywords": ["Preamble","Amendment to the Constitution", "Short Title, Commencement and Repeal","Preliminary"]
+                "part_keywords": ["Preamble","Amendment to the Constitution", "Short Title, Commencement and Repeal"]
             },
-            
+            r"\b(what is nepal|What is nepal|What is Nepal|Nepal|nepal|state of nepal|State of Nepal)\b": {
+                "source": "Constitution of Nepal, 2015",
+                "part_keywords": ["Preliminary"]
+            },
             #Extras
             r"\b(trafficking|human trafficking|selling person|prostitution|transportation of people)\b": {
                 "source": "Human Trafficking and Transportation (Control) Act",
@@ -405,50 +408,60 @@ class HybridRetriever:
         return filters
 
     def _apply_filters(self, doc_indices, filters):
-        if not filters: return doc_indices
-        filtered_indices = []
-        
-        for idx in doc_indices:
-            doc = self.docs[idx]
-            meta = doc['metadata']
+            if not filters: return doc_indices
+            filtered_indices = []
             
-            # Normalize Document Info
-            doc_src = str(meta.get('legal_document_source') or "").lower()
-            doc_ch = str(meta.get('chapter') or "").lower()
-            doc_text = str(doc.get('search_content') or "").lower()
+            for idx in doc_indices:
+                doc = self.docs[idx]
+                meta = doc['metadata']
+                
+                doc_src = str(meta.get('legal_document_source') or "").lower()
+                doc_ch = str(meta.get('chapter') or "").lower()
+                doc_part = str(meta.get('part') or "").lower()
+                doc_text = str(doc.get('search_content') or "").lower()
 
-            match_found = False
-            for f in filters:
-                # 1. Gather all potential source targets from the trigger map
-                targets = []
-                if f.get('source'): targets.append(f['source'].lower())
-                if f.get('sources'): targets.extend([s.lower() for s in f['sources']])
-                
-                # 2. LOOSE SOURCE MATCH: Check if any target is a substring of the doc source
-                # Or if the doc source is a substring of the target
-                src_match = any((t in doc_src or doc_src in t) for t in targets)
-                
-                if src_match:
-                    # 3. LOOSE KEYWORD MATCH
-                    all_kws = [str(kw).lower() for kw in (f.get('chapter_keywords', []) + f.get('part_keywords', []))]
+                match_found = False
+                for f in filters:
+                    # 1. Source Match (e.g., "Constitution")
+                    targets = []
+                    if f.get('source'): targets.append(f['source'].lower())
+                    if f.get('sources'): targets.extend([s.lower() for s in f['sources']])
                     
-                    if not all_kws:
-                        match_found = True
-                        break
+                    src_match = any((t in doc_src or doc_src in t) for t in targets)
                     
-                    # Check if keywords appear in Chapter, Source Name, or the actual Text
-                    kw_match = any(kw in doc_ch for kw in all_kws) or \
-                               any(kw in doc_src for kw in all_kws) or \
-                               any(kw in doc_text for kw in all_kws)
-                    
-                    if kw_match:
-                        match_found = True
-                        break
-            
-            if match_found:
-                filtered_indices.append(idx)
+                    if src_match:
+                        # 2. Extract Keywords
+                        chapter_kws = [str(kw).lower() for kw in f.get('chapter_keywords', [])]
+                        part_kws = [str(kw).lower() for kw in f.get('part_keywords', [])]
+                        all_kws = chapter_kws + part_kws
+                        
+                        if not all_kws:
+                            match_found = True
+                            break
+                        
+                        # 3. PRIORITY MATCHING:
+                        # Check if the metadata (Chapter/Part) specifically matches the trigger
+                        meta_match = any(kw in doc_ch for kw in chapter_kws) or \
+                                    any(kw in doc_part for kw in part_kws)
+                        
+                        if meta_match:
+                            match_found = True
+                            break
+                        
+                        # 4. WEAK MATCH (Fallback):
+                        # Only match text if it's a very specific phrase
+                        # (This prevents 'nepal' in text from matching everything)
+                        # We only do this if it didn't match meta but the source is correct
+                        # and the text strictly contains the keyword
+                        text_match = any(f" {kw} " in f" {doc_text} " for kw in all_kws if len(kw) > 4)
+                        if text_match:
+                            match_found = True
+                            break
                 
-        return filtered_indices
+                if match_found:
+                    filtered_indices.append(idx)
+                    
+            return filtered_indices
         
     def _rerank(self, query, candidate_docs):
         if not candidate_docs: return []
