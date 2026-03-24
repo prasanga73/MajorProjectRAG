@@ -95,7 +95,7 @@ class HybridRetriever:
                 "chapter_keywords": ["Offences Relating to Documents"]
             },
             
-            r"\b(stamp)\b": {
+            r"\b(stamp|stamps)\b": {
                 "source": "National Criminal Code, 2017 AD",
                 "chapter_keywords": ["Stamps"]
             },
@@ -104,6 +104,10 @@ class HybridRetriever:
             r"\b(animal|killing animal|cow|bull|bird|dog)\b": {
                 "source": "National Criminal Code, 2017 AD",
                 "chapter_keywords": ["Animals and Birds","Animals","Birds"]
+            },
+            r"\b(child abuse|sexual abuse of a minor|sexual abuse of minor|sexual abuse of a child)":{
+                "source": ["National Criminal Code, 2017 AD","Children's Act, 2018"],
+                "chapter_keywords": ["Sexual"]
             },
             r"\b(privacy|wiretapping|confidentiality|eavesdropping)\b":{
                 "source":"National Criminal Code, 2017 AD",
@@ -141,7 +145,7 @@ class HybridRetriever:
             # Inheritance and Property Division
             r"\b(partition|succession|property|inheritance|will|legacy|ancestral property)\b": {
                 "source": "National Civil Code, 2017 AD",
-                "chapter_keywords": ["Partition", "Succession"]
+                "chapter_keywords": ["Partition", "Succession","Property"]
             },
 
             # Land and Property Law

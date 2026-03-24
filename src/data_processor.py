@@ -31,7 +31,14 @@ class LegalDocProcessor:
             "Public Health",
             "Banks",
             "Companies Act",
-            "Muluki Civil"
+            "Muluki Civil",
+            "Children's Act",
+            "National Women Commission",
+            "Public",
+            "Discrimination",
+            "Social",
+            "Motherhood",
+            "Sexual Harassment"
         ]
 
     def _get_base_clause(self, clause_id):
