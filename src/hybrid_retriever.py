@@ -80,10 +80,17 @@ class HybridRetriever:
             },
 
             # Pregnancy and Sexual Offences
-            r"\b(abortion|pregnancy|foetus|rape|sexual intercourse|harassment|incest|molestation)\b": {
+            r"\b(abortion|pregnancy|foetus|rape)\b": {
                 "source": "National Criminal Code, 2017 AD",
                 "chapter_keywords": ["Protection of Pregnancy", "Sexual Offences"]
             },
+            r"\b(sexual harassement)\b":{
+                "sources":["National Criminal Code, 2017 AD","Sexual Harassment at the Workplace (Elimination) Act, 2015"],
+                "chapter_keywords":["Sexual Offences","Sexual Harassment"]
+                
+            },
+            
+
 
             # Financial Crimes (Theft, Fraud, Forgery)
             r"\b(theft|robbery|stealing|burglary|robbed|stole|steals|robs|robbing)\b": {
@@ -249,8 +256,8 @@ class HybridRetriever:
 
             # === SPECIFIC CRIMINAL OFFENCES (Muluki Ain / Penal Code) ===
             r"\b(rape|marital rape|sexual assault|sexual exploitation|forced nudity|prostitution|blackmail)\b": {
-                "sources": ["Muluki Ain (General Code)","Criminal Code"],
-                "chapter_keywords": ["Rape", "Sexual Offenses"]
+                "sources": ["Muluki Ain (General Code)","National Criminal Code, 2017 AD"],
+                "chapter_keywords": ["Rape", "Sexual Offences"]
             },
             r"\b(acid attack|corrosive|hazardous chemicals|section 193)\b": {
                 "sources": ["The Acid and Other Hazardous Chemicals (Regulation) Act", "Criminal Code"],
@@ -261,11 +268,11 @@ class HybridRetriever:
                 "chapter_keywords": ["Witchcraft"]
             },
             r"\b(child marriage|age of 20|early marriage)\b": {
-                "sources": ["Muluki Ain (General Code)"],
+                "sources": ["Muluki Ain (General Code)","Children's Act, 2018","National Criminal Code, 2017 AD"],
                 "chapter_keywords": ["Child Marriage","Offences Relating to Marriage"]
             },
             r"\b(infanticide|honor killing|homicide|murder|abduction|kidnapping)\b": {
-                "source": ["Muluki Ain (General Code)","Criminal Code"],
+                "source": ["National Criminal Code, 2017 AD"],
                 "chapter_keywords": ["Homicide", "Abduction","Offences Relating to Human Body"]
             },
 
