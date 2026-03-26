@@ -113,7 +113,7 @@ class HybridRetriever:
                 "chapter_keywords": ["Animals and Birds","Animals","Birds"]
             },
             r"\b(child abuse|sexual abuse of a minor|sexual abuse of minor|sexual abuse of a child)":{
-                "source": ["National Criminal Code, 2017 AD","Children's Act, 2018"],
+                "sources": ["National Criminal Code, 2017 AD","Children's Act, 2018"],
                 "chapter_keywords": ["Sexual"]
             },
             r"\b(privacy|wiretapping|confidentiality|eavesdropping)\b":{

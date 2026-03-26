@@ -38,7 +38,8 @@ class LegalDocProcessor:
             "Discrimination",
             "Social",
             "Motherhood",
-            "Sexual Harassment"
+            "Sexual Harassment",
+            "Sexual Harassment at the Workplace (Elimination) Act, 2015"
         ]
 
     def _get_base_clause(self, clause_id):
