@@ -84,7 +84,7 @@ class HybridRetriever:
                 "source": "National Criminal Code, 2017 AD",
                 "chapter_keywords": ["Protection of Pregnancy", "Sexual Offences"]
             },
-            r"\b(sexual harassement)\b":{
+            r"\b(sexual harassement|sexual harassment|workplace harassement|workplace harassment)\b":{
                 "sources":["National Criminal Code, 2017 AD","Sexual Harassment at the Workplace (Elimination) Act, 2015"],
                 "chapter_keywords":["Sexual Offences","Sexual Harassment"]
                 
