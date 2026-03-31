@@ -419,60 +419,72 @@ class HybridRetriever:
         return filters
 
     def _apply_filters(self, doc_indices, filters):
-            if not filters: return doc_indices
-            filtered_indices = []
-            
-            for idx in doc_indices:
-                doc = self.docs[idx]
-                meta = doc['metadata']
-                
-                doc_src = str(meta.get('legal_document_source') or "").lower()
-                doc_ch = str(meta.get('chapter') or "").lower()
-                doc_part = str(meta.get('part') or "").lower()
-                doc_text = str(doc.get('search_content') or "").lower()
+        if not filters: return doc_indices
+        filtered_indices = []
+        
+        def to_str_list(val):
+            """Flatten any value (str, list, nested list) into a flat list of strings."""
+            if not val:
+                return []
+            if isinstance(val, str):
+                return [val]
+            if isinstance(val, list):
+                result = []
+                for item in val:
+                    result.extend(to_str_list(item))  # recurse to handle nesting
+                return result
+            return [str(val)]
 
-                match_found = False
-                for f in filters:
-                    # 1. Source Match (e.g., "Constitution")
-                    targets = []
-                    if f.get('source'): targets.append(f['source'].lower())
-                    if f.get('sources'): targets.extend([s.lower() for s in f['sources']])
-                    
-                    src_match = any((t in doc_src or doc_src in t) for t in targets)
-                    
-                    if src_match:
-                        # 2. Extract Keywords
-                        chapter_kws = [str(kw).lower() for kw in f.get('chapter_keywords', [])]
-                        part_kws = [str(kw).lower() for kw in f.get('part_keywords', [])]
-                        all_kws = chapter_kws + part_kws
-                        
-                        if not all_kws:
-                            match_found = True
-                            break
-                        
-                        # 3. PRIORITY MATCHING:
-                        # Check if the metadata (Chapter/Part) specifically matches the trigger
-                        meta_match = any(kw in doc_ch for kw in chapter_kws) or \
-                                    any(kw in doc_part for kw in part_kws)
-                        
-                        if meta_match:
-                            match_found = True
-                            break
-                        
-                        # 4. WEAK MATCH (Fallback):
-                        # Only match text if it's a very specific phrase
-                        # (This prevents 'nepal' in text from matching everything)
-                        # We only do this if it didn't match meta but the source is correct
-                        # and the text strictly contains the keyword
-                        text_match = any(f" {kw} " in f" {doc_text} " for kw in all_kws if len(kw) > 4)
-                        if text_match:
-                            match_found = True
-                            break
+        for idx in doc_indices:
+            doc = self.docs[idx]
+            meta = doc['metadata']
+            
+            # Safely handle list-type metadata
+            raw_src = meta.get('legal_document_source') or ""
+            doc_src = " ".join(to_str_list(raw_src)).lower()
+            doc_ch = str(meta.get('chapter') or "").lower()
+            doc_part = str(meta.get('part') or "").lower()
+            doc_text = str(doc.get('search_content') or "").lower()
+
+            match_found = False
+            for f in filters:
+                # 1. Source Match — safely flatten source/sources
+                targets = []
+                if f.get('source'):
+                    targets.extend([s.lower() for s in to_str_list(f['source'])])
+                if f.get('sources'):
+                    targets.extend([s.lower() for s in to_str_list(f['sources'])])
                 
-                if match_found:
-                    filtered_indices.append(idx)
+                if not targets:
+                    continue
+
+                src_match = any((t in doc_src or doc_src in t) for t in targets)
+                
+                if src_match:
+                    chapter_kws = [str(kw).lower() for kw in f.get('chapter_keywords', [])]
+                    part_kws = [str(kw).lower() for kw in f.get('part_keywords', [])]
+                    all_kws = chapter_kws + part_kws
                     
-            return filtered_indices
+                    if not all_kws:
+                        match_found = True
+                        break
+                    
+                    meta_match = any(kw in doc_ch for kw in chapter_kws) or \
+                                any(kw in doc_part for kw in part_kws)
+                    
+                    if meta_match:
+                        match_found = True
+                        break
+                    
+                    text_match = any(f" {kw} " in f" {doc_text} " for kw in all_kws if len(kw) > 4)
+                    if text_match:
+                        match_found = True
+                        break
+            
+            if match_found:
+                filtered_indices.append(idx)
+                
+        return filtered_indices
         
     def _rerank(self, query, candidate_docs):
         if not candidate_docs: return []
