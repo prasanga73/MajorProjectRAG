@@ -68,9 +68,9 @@ class HybridRetriever:
             },
 
             # Violence Against Human Body
-            r"\b(murder|homicide|killing|kill|killed|kills|murder|murdered|suicide|assault|beating|hurt|grievous hurt|acid|injury)\b": {
+            r"\b(homicide|killing|kill|killed|kills|murdered|murder|suicide|assault|beating|hurt|grievous hurt|acid|injury)\b": {
                 "source": "National Criminal Code, 2017 AD",
-                "chapter_keywords": ["Human Body and Assault", "Hurt/Grievous Hurt"]
+                "chapter_keywords": ["Human Body and Assault", "Hurt/Grievous Hurt","Offences Relating to Human Body","Homicide"]
             },
 
             # Liberty and Kidnapping
@@ -271,9 +271,9 @@ class HybridRetriever:
                 "sources": ["Muluki Ain (General Code)","Children's Act, 2018","National Criminal Code, 2017 AD"],
                 "chapter_keywords": ["Child Marriage","Offences Relating to Marriage"]
             },
-            r"\b(infanticide|honor killing|homicide|murder|abduction|kidnapping)\b": {
+            r"\b(|abduction|kidnapping)\b": {
                 "source": ["National Criminal Code, 2017 AD"],
-                "chapter_keywords": ["Homicide", "Abduction","Offences Relating to Human Body"]
+                "chapter_keywords": ["Abduction"]
             },
 
             # === TRAFFIC and VEHICLES (Ma Pa Se, License, Registration) ===
