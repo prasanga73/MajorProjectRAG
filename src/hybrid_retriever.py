@@ -38,7 +38,7 @@ class HybridRetriever:
             # ============================================================
             
             # General Criminal Principles
-            r"\b(criminal justice|conspiracy|attempt|abetment|accomplice|punishment|sentencing|mitigating|aggravating)\b": {
+            r"\b(criminal justice|conspiracy|abetment|accomplice|sentencing|mitigating|aggravating)\b": {
                 "source": "National Criminal Code, 2017 AD",
                 "chapter_keywords": ["General Principles of Criminal Justice", "Criminal Conspiracy, Attempt, Abetment and Accomplice", "Punishment and Interim Relief"]
             },
